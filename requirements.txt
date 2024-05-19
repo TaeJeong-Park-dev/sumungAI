@@ -1,0 +1,8 @@
+pandas
+os
+torch
+transformers
+langchain
+PyPDFLoader
+faiss-cpu
+faiss-gpu
