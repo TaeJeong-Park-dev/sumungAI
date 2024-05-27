@@ -3,11 +3,14 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 import base64
 import fitz
 import io
 import os
+from langchain_community.document_loaders import PyPDFLoader
+from langchain.vectorstores import FAISS
+from langchain.embeddings import OpenAIEmbeddings
 
 categories = {'19':'학사','20':'일반', '21':'사회봉사', '22':'등록_장학', '189':'학생생활', '190':'글로벌', '162':'진로취업', '420':'비교과'}
 
@@ -23,9 +26,12 @@ def crawl_and_save():
 
     driver = webdriver.Chrome(options=options)
     
-    today = datetime.today().strftime('%Y-%m-%d')
-    start = today
-    end = today
+    # 현재 날짜에서 하루 전 날짜 계산
+    yesterday = datetime.today() - timedelta(days=1)
+    start = yesterday.strftime('%Y-%m-%d')
+    end = start
+
+    documents = []
 
     for data in categories:
         count = 0  
@@ -77,6 +83,13 @@ def crawl_and_save():
                 with open(path, 'wb') as f:
                     f.write(pdf_stream.getvalue())
 
+                # 문서 객체로 변환 및 저장
+                loader = PyPDFLoader(path)
+                pdf_documents = loader.load_and_split()
+                for doc in pdf_documents:
+                    doc.metadata["source"] = filename
+                documents.extend(pdf_documents)
+
                 doc.close()
                 count += 1
 
@@ -90,6 +103,15 @@ def crawl_and_save():
         time.sleep(0.1)
 
     driver.quit()
+    
+    return documents
 
 if __name__ == "__main__":
-    crawl_and_save()
+    documents = crawl_and_save()
+    
+    # 기존 벡터 저장소 로드 및 업데이트
+    embeddings = OpenAIEmbeddings()
+    vector_store_path = "vector_store"
+    vector_store = FAISS.load_local(vector_store_path, embeddings, allow_dangerous_deserialization=True)
+    vector_store.add_documents(documents)
+    vector_store.save_local(vector_store_path)
