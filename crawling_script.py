@@ -87,7 +87,7 @@ def crawl_and_save():
                 loader = PyPDFLoader(path)
                 pdf_documents = loader.load_and_split()
                 for doc in pdf_documents:
-                    doc.metadata["source"] = filename
+                    doc.metadata["source"] = path  # filename 대신 path 사용
                 documents.extend(pdf_documents)
 
                 doc.close()
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     documents = crawl_and_save()
     
     # 기존 벡터 저장소 로드 및 업데이트
-    embeddings = OpenAIEmbeddings()
+    embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
     vector_store_path = "vector_store"
     vector_store = FAISS.load_local(vector_store_path, embeddings, allow_dangerous_deserialization=True)
     vector_store.add_documents(documents)
