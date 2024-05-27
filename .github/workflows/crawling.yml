@@ -34,7 +34,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run crawling script
-        run: python your_crawling_script.py
+        run: python crawling_script.py
 
       - name: Commit and push changes
         run: |
