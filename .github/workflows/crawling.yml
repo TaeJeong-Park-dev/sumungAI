@@ -23,7 +23,17 @@ jobs:
           sudo apt-get install -y wget unzip
           wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/$(wget -qO- https://chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip
           unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
-          pip install selenium
+          pip install selenium requests pymupdf
 
       - name: Run crawling script
-        run: python crawling_script.py
+        run: python your_crawling_script.py
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'TaeJeong-Park-dev'
+          git config --global user.email 'taejung3852@gmail.com'
+          git add -A
+          git commit -m "공지사항 업데이트!"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
