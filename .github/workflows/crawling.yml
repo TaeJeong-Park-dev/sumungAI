@@ -1,0 +1,28 @@
+name: auto-crawling
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow at 04:00 every day
+  schedule:
+    - cron: '0 4 * * *'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+
+      # Runs a single command using the runners shell
+      - name: Run crawling script
+        run: |
+          echo Starting crawling task...
+          # 여기에 실제 크롤링 스크립트를 실행하는 명령어를 추가하세요
+          python crawling_script.py
