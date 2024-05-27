@@ -5,3 +5,4 @@ langchain
 PyPDFLoader
 faiss-cpu
 faiss-gpu
+pypdf2
